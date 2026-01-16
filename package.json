@@ -1,0 +1,17 @@
+{
+  "name": "model",
+  "version": "1.0.0",
+  "description": "Комп'ютерний практикум №1 - Перевірка генератора випадкових чисел",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "asciichart": "^1.5.25"
+  }
+}
