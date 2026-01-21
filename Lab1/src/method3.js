@@ -43,7 +43,7 @@ function chiSquaredTestUniform(data, bins = 10) {
     results.push({ bin: i + 1, observed, expected: expected.toFixed(2) });
   }
   
-  return { chiSquared, df: bins - 1, results }; // df = k - 1 (немає оцінюваних параметрів)
+  return { chiSquared, df: bins - 1, results };
 }
 
 module.exports = {

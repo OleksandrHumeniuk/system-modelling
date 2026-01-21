@@ -51,10 +51,15 @@ function chiSquaredTestExponential(data, lambda, bins = 10) {
       chiSquared += Math.pow(observed - expected, 2) / expected;
     }
     
-    results.push({ interval: `[${a.toFixed(2)}, ${b.toFixed(2)})`, observed, expected: expected.toFixed(2) });
+    results.push(
+      { 
+        interval: `[${a.toFixed(2)}, ${b.toFixed(2)})`, 
+        observed, 
+        expected: expected.toFixed(2) 
+      });
   }
   
-  return { chiSquared, df: bins - 1 - 1, results };
+  return { chiSquared, df: bins - 1, results };
 }
 
 module.exports = {

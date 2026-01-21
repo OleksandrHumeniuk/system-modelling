@@ -22,18 +22,6 @@ function generateNormal(n, a, sigma) {
 }
 
 /**
- * Функція густини нормального розподілу
- * @param {number} x - значення
- * @param {number} a - параметр нормального розподілу
- * @param {number} sigma - параметр нормального розподілу
- * @returns {number} густина нормального розподілу
- */
-function normalPDF(x, a, sigma) {
-  const exponent = -Math.pow(x - a, 2) / (2 * sigma * sigma);
-  return (1 / (sigma * Math.sqrt(2 * Math.PI))) * Math.exp(exponent);
-}
-
-/**
  * Функція розподілу нормального закону (апроксимація)
  * @param {number} x - значення
  * @param {number} a - параметр нормального розподілу
@@ -80,12 +68,11 @@ function chiSquaredTestNormal(data, a, sigma, bins = 10) {
     results.push({ interval: `[${leftBound.toFixed(2)}, ${rightBound.toFixed(2)})`, observed, expected: expected.toFixed(2) });
   }
   
-  return { chiSquared, df: bins - 1 - 2, results };
+  return { chiSquared, df: bins - 1, results };
 }
 
 module.exports = {
   generateNormal,
-  normalPDF,
   normalCDF,
   chiSquaredTestNormal
 };

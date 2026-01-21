@@ -6,24 +6,20 @@ const { generateLCG, chiSquaredTestUniform } = require('./src/method3');
 const N = 1000;
 
 (() => {
-  console.log(`\n   Кількість згенерованих чисел: ${N}`);
-  
   console.log('Метод 1: Експоненційний розподіл (метод оберненої функції)');
-  console.log('Формула: xi = -(1/λ) * ln(ξi)');
-  console.log('F(x) = 1 - e^(-λx)');
 
   const lambdaValues = [0.5, 1.0, 2.0];
   
   for (const lambda of lambdaValues) {
-    const expData = generateExponential(N, lambda);
-    const expTest = chiSquaredTestExponential(expData, lambda);
+    const generatedNumbers = generateExponential(N, lambda);
+    const expTest = chiSquaredTestExponential(generatedNumbers, lambda);
     
     const theoreticalMean = 1 / lambda;
     const theoreticalVar = 1 / (lambda * lambda);
     
     printResults(
       `Експоненційний розподіл (λ = ${lambda})`,
-      expData,
+      generatedNumbers,
       expTest,
       { 
         'λ (lambda)': lambda,
@@ -34,8 +30,6 @@ const N = 1000;
   }
   
   console.log('Метод 2: Нормальний розподіл');
-  console.log('Формула: xi = σ*μi + a, де μi = Σ(ξj) - 6 (j=1..12)');
-  console.log('f(x) = (1/(σ√2π)) * exp(-(x-a)²/(2σ²))');
   
   const normalParams = [
     { a: 0, sigma: 1 },
@@ -61,8 +55,6 @@ const N = 1000;
   }
   
   console.log('Метод 3: Лінійний конгруентний генератор (ЛКГ)');
-  console.log('Формула: zi+1 = a*zi (mod c), xi+1 = zi+1/c');
-  console.log('Рівномірний розподіл в інтервалі (0; 1)');
   
   const lcgParams = [
     { a: Math.pow(5, 13), c: Math.pow(2, 31), name: 'a=5¹³, c=2³¹' },
