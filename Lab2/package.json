@@ -1,0 +1,15 @@
+{
+  "name": "lab2-discrete-event-simulation",
+  "version": "1.0.0",
+  "scripts": {
+    "task1": "node task1-simple.js",
+    "task2": "node task2-utilization.js",
+    "task3": "node task3-sequential.js",
+    "task4": "node task4-verification.js",
+    "task5": "node task5-multiserver.js",
+    "task6": "node task6-routing.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}
