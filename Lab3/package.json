@@ -1,0 +1,10 @@
+{
+  "name": "lab3-queuing-simulations",
+  "version": "1.0.0",
+  "scripts": {
+    "task2": "node task2.js",
+    "task3": "node task3.js"
+  },
+  "license": "ISC",
+  "type": "commonjs"
+}
