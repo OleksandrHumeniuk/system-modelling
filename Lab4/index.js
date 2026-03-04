@@ -10,11 +10,10 @@ const Dispose = require('./src/elements/Dispose');
 const Router = require('./src/elements/Router');
 const { exponential } = require('./src/utils/random');
 
-const END_TIME = 2000;
 const MEAN_ARRIVAL = 1;
 const MEAN_SERVICE = 0.8;
-const RUNS_PER_N = 5;
-const N_VALUES = [2, 5, 10, 15, 20];
+const TRIALS = 5;
+const N_VALUES = [2, 10, 100, 500, 1000, 2000, 5000, 10000, 15000, 20000, 25000, 30000, 35000, 40000, 45000, 50000];
 
 // ——— Структура 1: ланцюг Create → P1 → P2 → … → PN → Dispose ———
 function buildChainModel(n) {
@@ -50,22 +49,35 @@ function buildParallelModel(n) {
   return { model, create };
 }
 
-function runExperiment(buildModel, label) {
+function runExperiment(buildModel, structureName) {
   const results = [];
-  for (const n of N_VALUES) {
+  for (let i = 0; i < N_VALUES.length; i++) {
+    const n = N_VALUES[i];
+    const E = n + 1;
     const times = [];
     const events = [];
-    for (let r = 0; r < RUNS_PER_N; r++) {
+    for (let t = 0; t < TRIALS; t++) {
       const { model, create } = buildModel(n);
       model.reset();
       create.start();
-      const res = model.simulate(END_TIME, { silent: true });
+      const res = model.simulate(Infinity, { silent: true, maxEvents: E });
       times.push(res.realTimeMs);
       events.push(res.eventCount);
     }
-    const avgTime = times.reduce((a, b) => a + b, 0) / RUNS_PER_N;
-    const avgEvents = events.reduce((a, b) => a + b, 0) / RUNS_PER_N;
-    results.push({ n, eventSources: n + 1, avgTime: Math.round(avgTime * 100) / 100, avgEvents: Math.round(avgEvents) });
+    const avgTime = times.reduce((a, b) => a + b, 0) / TRIALS;
+    const avgEvents = events.reduce((a, b) => a + b, 0) / TRIALS;
+    const stdTime = TRIALS > 1
+      ? Math.sqrt(times.map(t => (t - avgTime) ** 2).reduce((a, b) => a + b, 0) / (TRIALS - 1))
+      : 0;
+    results.push({
+      structure: structureName,
+      n,
+      events: E,
+      avgTime: Math.round(avgTime * 100) / 100,
+      stdTime: Math.round(stdTime * 100) / 100,
+      avgEvents: Math.round(avgEvents),
+      times
+    });
   }
   return results;
 }
@@ -74,24 +86,23 @@ function printTable(data, title) {
   console.log('\n' + '='.repeat(70));
   console.log(title);
   console.log('='.repeat(70));
-  console.log('  N (СМО)   Оцінка подій (N+1)   Середня кількість подій   Час (мс)');
+  console.log('  N (СМО)   Оброблено подій (E)   Середня подій   Час (мс)');
   console.log('-'.repeat(70));
   for (const row of data) {
-    console.log(`  ${String(row.n).padStart(5)}    ${String(row.eventSources).padStart(10)}           ${String(row.avgEvents).padStart(15)}             ${row.avgTime}`);
+    console.log(`  ${String(row.n).padStart(5)}    ${String(row.events).padStart(12)}       ${String(row.avgEvents).padStart(10)}     ${String(row.avgTime).padStart(8)}`);
   }
   console.log('='.repeat(70));
 }
 
 console.log('ЛАБОРАТОРНА РОБОТА 4 — ЕКСПЕРИМЕНТИ З СКЛАДНІСТЮ СИМУЛЯЦІЇ');
-console.log('Час симуляції: ' + END_TIME + ', запусків на кожне N: ' + RUNS_PER_N);
-console.log('Значення N: ' + N_VALUES.join(', '));
+console.log('N: ' + N_VALUES.join(', '));
 
 // Завдання 2: експерименти для структури "ланцюг"
-const chainResults = runExperiment(buildChainModel, 'Структура 1: ланцюг');
+const chainResults = runExperiment(buildChainModel, 'chain');
 printTable(chainResults, 'ЗАВДАННЯ 2 — Експериментальна оцінка складності (структура: ланцюг N СМО)');
 
-// Завдання 4: повтор експерименту при зміні структури (паралельні СМО)
-const parallelResults = runExperiment(buildParallelModel, 'Структура 2: паралельні СМО');
+// // Завдання 4: повтор експерименту при зміні структури (паралельні СМО)
+const parallelResults = runExperiment(buildParallelModel, 'parallel');
 printTable(parallelResults, 'ЗАВДАННЯ 4 — Повтор експерименту (структура: паралельні N СМО)');
 
 // Порівняння
@@ -101,4 +112,3 @@ console.log('-'.repeat(35));
 for (let i = 0; i < N_VALUES.length; i++) {
   console.log(`  ${String(N_VALUES[i]).padStart(3)}    ${String(chainResults[i].avgTime).padStart(8)}   ${String(parallelResults[i].avgTime).padStart(8)}`);
 }
-console.log('\nПримітка: при паралельній структурі заявки розподіляються між N процесами;\nкількість подій та час можуть відрізнятися через іншу динаміку черг.');

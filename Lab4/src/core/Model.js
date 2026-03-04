@@ -37,34 +37,38 @@ class Model {
   }
 
   /**
-   * Запустити симуляцію на вказаний час.
-   * @param {number} endTime - Час завершення симуляції
-   * @param {{ silent?: boolean }} options - silent: true — не виводити логи і статистику
+   * Запустити симуляцію на вказаний час або до обробки заданої кількості подій.
+   * @param {number} endTime - Час завершення симуляції (ігнорується, якщо вказано maxEvents)
+   * @param {{ silent?: boolean, maxEvents?: number }} options - silent: не виводити логи; maxEvents: зупинити після N оброблених подій
    * @returns {{ eventCount: number, realTimeMs: number, currentTime: number }}
    */
   simulate(endTime, options = {}) {
     const silent = options.silent === true;
+    const maxEvents = options.maxEvents;
     this.running = true;
     this.currentTime = 0;
 
     if (!silent) {
+      const limitDesc = maxEvents != null ? `${maxEvents} подій` : `0 → ${endTime} одиниць часу`;
       console.log(`\n${'='.repeat(70)}`);
-      console.log(`Запуск симуляції: 0 → ${endTime} одиниць часу`);
+      console.log(`Запуск симуляції: ${limitDesc}`);
       console.log('='.repeat(70));
     }
 
     let eventCount = 0;
     const startRealTime = Date.now();
+    const timeLimit = maxEvents != null ? Infinity : endTime;
 
     while (this.eventQueue.length > 0 && this.running) {
       const event = this.getNextEvent();
-      if (event.time > endTime) {
-        this.currentTime = endTime;
+      if (event.time > timeLimit) {
+        this.currentTime = timeLimit;
         break;
       }
       this.currentTime = event.time;
       eventCount++;
       this.processEvent(event);
+      if (maxEvents != null && eventCount >= maxEvents) break;
     }
 
     const realTimeMs = Date.now() - startRealTime;
